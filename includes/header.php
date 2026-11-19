@@ -38,6 +38,7 @@ function nav_current(string $file, string $current): string
         <nav class="site-nav" aria-label="Main">
             <?php if (is_logged_in()): ?>
                 <a href="game.php"<?= nav_current('game.php', $currentPage) ?>>Play</a>
+            <a href="leaderboard.php"<?= nav_current('leaderboard.php', $currentPage) ?>>Leaderboard</a>
                 <a href="leaderboard.php"<?= nav_current('leaderboard.php', $currentPage) ?>>Leaderboard</a>
                 <span class="nav-user"><?= e($_SESSION['user']) ?></span>
                 <a href="logout.php">Log out</a>
