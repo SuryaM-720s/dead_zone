@@ -1,5 +1,6 @@
 # Runtime data: contains password hashes, never commit
 data/*.json
+data/*.key
 
 .DS_Store
 

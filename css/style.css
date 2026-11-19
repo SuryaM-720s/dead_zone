@@ -221,6 +221,18 @@ h2 { font-size: 1.05rem; letter-spacing: 0.02em; }
 .class-stats { font-size: 0.78rem; letter-spacing: 0.05em; color: var(--accent); }
 .class-perk { font-size: 0.85rem; color: #cfd3c5; }
 
+.resume {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border-color: rgba(180, 220, 74, 0.4);
+    margin-bottom: 1.5rem;
+}
+.resume h2,
+.resume p { margin: 0; }
+
 /* ---------- Landing ---------- */
 
 .hero-banner { padding: 2rem 0 2.5rem; }

@@ -8,6 +8,7 @@
  */
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/engine.php';
+require_once __DIR__ . '/includes/save.php';
 require_login();
 
 if (isset($_SESSION['result'])) {
@@ -32,7 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    redirect(isset($_SESSION['result']) ? 'ending.php' : 'game.php');
+    // Keep the save cookie in sync: update it mid-run, delete it once the run ends
+    if (isset($_SESSION['result'])) {
+        clear_save();
+        redirect('ending.php');
+    }
+    write_save();
+    redirect('game.php');
 }
 
 $hero  = $_SESSION['hero'];
