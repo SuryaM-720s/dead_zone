@@ -504,7 +504,8 @@ function finish_run(string $endingKey): void
         'survivors' => $hero['survivors'],
         'seconds'   => time() - ($_SESSION['run_started'] ?? time()),
     ];
-    $_SESSION['scores'][] = $entry;
+    $_SESSION['scores'][] = $entry;   // session leaderboard (this visit)
+    record_score($entry);             // all-time leaderboard (every player)
 
     $_SESSION['result'] = $entry + [
         'breakdown' => $score['breakdown'],
@@ -513,12 +514,11 @@ function finish_run(string $endingKey): void
 }
 
 /**
- * Top N runs this session: highest score first, then fewer moves, then faster time.
+ * Sort runs best-first: highest score, then fewer moves, then faster time.
  */
-function leaderboard(int $limit = 10): array
+function sort_runs(array $runs): array
 {
-    $scores = $_SESSION['scores'] ?? [];
-    usort($scores, function ($a, $b) {
+    usort($runs, function ($a, $b) {
         if ($a['score'] !== $b['score']) {
             return $b['score'] <=> $a['score'];
         }
@@ -527,5 +527,66 @@ function leaderboard(int $limit = 10): array
         }
         return $a['seconds'] <=> $b['seconds'];
     });
-    return array_slice($scores, 0, $limit);
+    return $runs;
+}
+
+/**
+ * Top N runs this session (the required session leaderboard).
+ */
+function leaderboard(int $limit = 10): array
+{
+    return array_slice(sort_runs($_SESSION['scores'] ?? []), 0, $limit);
+}
+
+/* ───────────────────── ALL-TIME LEADERBOARD (flat file) ───────────────────── */
+
+define('SCORES_FILE', DATA_DIR . '/scores.json');
+const SCORES_KEEP = 200;   // keep the file small: only the best 200 runs
+
+/**
+ * Every run ever finished on this server, from data/scores.json.
+ * Scores are written only by finish_run() on the server, never from
+ * anything the browser sends, so the file can be trusted.
+ */
+function load_all_scores(): array
+{
+    if (!file_exists(SCORES_FILE)) {
+        return [];
+    }
+    $scores = json_decode((string) file_get_contents(SCORES_FILE), true);
+    return is_array($scores) ? $scores : [];
+}
+
+/**
+ * Add one finished run to the all-time file (locked so two players
+ * finishing at once can't overwrite each other).
+ */
+function record_score(array $entry): void
+{
+    if (!is_dir(DATA_DIR)) {
+        mkdir(DATA_DIR, 0755, true);
+    }
+    $handle = fopen(SCORES_FILE, 'c+');
+    if ($handle === false) {
+        return; // can't write: the session leaderboard still works
+    }
+    flock($handle, LOCK_EX);
+    $scores = json_decode((string) stream_get_contents($handle), true);
+    $scores = is_array($scores) ? $scores : [];
+    $scores[] = $entry;
+    $scores = array_slice(sort_runs($scores), 0, SCORES_KEEP);
+    ftruncate($handle, 0);
+    rewind($handle);
+    fwrite($handle, (string) json_encode($scores, JSON_PRETTY_PRINT));
+    fflush($handle);
+    flock($handle, LOCK_UN);
+    fclose($handle);
+}
+
+/**
+ * Top N runs from every player.
+ */
+function all_time_leaderboard(int $limit = 10): array
+{
+    return array_slice(sort_runs(load_all_scores()), 0, $limit);
 }
