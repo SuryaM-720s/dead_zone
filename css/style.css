@@ -755,3 +755,31 @@ a:hover { text-decoration-color: var(--ink); }
     .btn-row .btn { flex: 1 1 100%; }
     .page { padding-top: var(--s-6); }
 }
+
+/* Narrow phones: the logo mark stands in for the wordmark so the nav fits */
+@media (max-width: 480px) {
+    .brand { min-width: 44px; justify-content: center; }
+    .brand-text {
+        position: absolute; width: 1px; height: 1px; overflow: hidden;
+        clip: rect(0 0 0 0); white-space: nowrap;
+    }
+    .brand-mark { width: 16px; height: 16px; }
+    .site-header .wrap { gap: var(--s-2); }
+    .site-nav a { padding: 0 6px; }
+    .site-nav a::after { left: 6px; right: 6px; }
+}
+
+/* Team page ---------------------------------------------------------------- */
+.team { max-width: 880px; }
+.team .lead { margin-bottom: var(--s-7); }
+.team h2 { font-size: 1.25rem; margin-bottom: var(--s-4); }
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--s-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.team-grid h3 { font-size: 1.125rem; margin-bottom: var(--s-1); }
+.team-grid p:last-child { margin: 0; }

@@ -34,15 +34,16 @@ function nav_current(string $file, string $current): string
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
     <div class="wrap">
-        <a class="brand" href="index.php" translate="no"><span class="brand-mark" aria-hidden="true"></span>Dead Zone</a>
+        <a class="brand" href="index.php" translate="no"><span class="brand-mark" aria-hidden="true"></span><span class="brand-text">Dead Zone</span></a>
         <nav class="site-nav" aria-label="Main">
             <?php if (is_logged_in()): ?>
                 <a href="game.php"<?= nav_current('game.php', $currentPage) ?>>Play</a>
-            <a href="leaderboard.php"<?= nav_current('leaderboard.php', $currentPage) ?>>Leaderboard</a>
                 <a href="leaderboard.php"<?= nav_current('leaderboard.php', $currentPage) ?>>Leaderboard</a>
+                <a href="team.php"<?= nav_current('team.php', $currentPage) ?>>Team</a>
                 <span class="nav-user"><?= e($_SESSION['user']) ?></span>
                 <a href="logout.php">Log out</a>
             <?php else: ?>
+                <a href="team.php"<?= nav_current('team.php', $currentPage) ?>>Team</a>
                 <a href="login.php"<?= nav_current('login.php', $currentPage) ?>>Log in</a>
                 <a href="register.php"<?= nav_current('register.php', $currentPage) ?>>Register</a>
             <?php endif; ?>
