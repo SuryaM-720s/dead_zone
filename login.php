@@ -13,6 +13,7 @@ $error = '';
 $username = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
     $username = trim((string) filter_input(INPUT_POST, 'username', FILTER_UNSAFE_RAW));
     $password = (string) filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW);
 
@@ -50,6 +51,7 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <form method="post" action="login.php" novalidate>
+            <?= csrf_field() ?>
         <div class="field">
             <label for="username">Username</label>
             <input id="username" name="username" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"
