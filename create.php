@@ -52,23 +52,23 @@ $pageTitle = 'New Survivor';
 require __DIR__ . '/includes/header.php';
 ?>
 <section class="create">
-    <h1>Who are you?</h1>
-    <p class="muted">Your class decides your starting stats, your gear, and which routes you can take.</p>
+    <h1>Choose your survivor</h1>
+    <p class="lead">Your class sets your starting stats and gear, and opens routes the other two can't take.</p>
 
     <?php if ($saved['status'] === 'ok'):
         $savedHero = $saved['save']['hero'];
         $savedPlace = story_nodes()[$saved['save']['node']]['title'];
     ?>
-        <div class="panel resume">
+        <div class="resume">
             <div>
-                <h2>Saved run found</h2>
-                <p class="muted small">
-                    <?= e($savedHero['name']) ?> the <?= e(class_defs()[$savedHero['class']]['label']) ?>
+                <h2>Saved run: <?= e($savedHero['name']) ?></h2>
+                <p class="muted small mono">
+                    <?= e(class_defs()[$savedHero['class']]['label']) ?>
                     · <?= e($savedPlace) ?> · move <?= $savedHero['moves'] + 1 ?>
                 </p>
             </div>
             <form method="post" action="resume.php">
-                <button class="btn btn-primary" type="submit">Resume</button>
+                <button class="btn btn-primary" type="submit">Resume this run</button>
             </form>
         </div>
     <?php endif; ?>
@@ -81,31 +81,38 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <form method="post" action="create.php" novalidate>
-        <div class="field <?= isset($errors['name']) ? 'has-error' : '' ?>">
+        <div class="field name-field <?= isset($errors['name']) ? 'has-error' : '' ?>">
             <label for="name">Survivor name</label>
-            <input id="name" name="name" type="text" maxlength="20" value="<?= e($name) ?>" required>
+            <input id="name" name="name" type="text" maxlength="20" autocomplete="off" value="<?= e($name) ?>" required>
             <?php if (isset($errors['name'])): ?><p class="field-error"><?= e($errors['name']) ?></p><?php endif; ?>
         </div>
 
         <fieldset class="class-picker <?= isset($errors['class']) ? 'has-error' : '' ?>">
-            <legend>Class</legend>
-            <?php foreach ($classes as $key => $def): ?>
-                <label class="class-card">
-                    <input type="radio" name="class" value="<?= e($key) ?>" <?= $class === $key ? 'checked' : '' ?>>
-                    <span class="class-body">
-                        <strong><?= e($def['label']) ?></strong>
-                        <em><?= e($def['tagline']) ?></em>
-                        <span class="class-stats">
-                            HP <?= $def['health'] ?> · STA <?= $def['stamina'] ?> · LUCK <?= $def['luck'] ?>
+            <legend class="field-legend">Class</legend>
+            <div class="class-grid">
+                <?php foreach ($classes as $key => $def): ?>
+                    <label class="class-card">
+                        <input type="radio" name="class" value="<?= e($key) ?>" <?= $class === $key ? 'checked' : '' ?>>
+                        <span class="class-body">
+                            <span class="class-name"><?= e($def['label']) ?></span>
+                            <span class="class-tagline"><?= e($def['tagline']) ?></span>
+                            <span class="class-stats">
+                                <?php foreach (['health' => 'Health', 'stamina' => 'Stamina', 'luck' => 'Luck'] as $stat => $label): ?>
+                                    <span class="readout">
+                                        <span><?= $label ?></span><b><?= $def[$stat] ?></b>
+                                        <span class="meter"><i style="width: <?= $def[$stat] ?>%"></i></span>
+                                    </span>
+                                <?php endforeach; ?>
+                            </span>
+                            <span class="class-perk"><?= e($def['perk']) ?></span>
                         </span>
-                        <span class="class-perk"><?= e($def['perk']) ?></span>
-                    </span>
-                </label>
-            <?php endforeach; ?>
+                    </label>
+                <?php endforeach; ?>
+            </div>
             <?php if (isset($errors['class'])): ?><p class="field-error"><?= e($errors['class']) ?></p><?php endif; ?>
         </fieldset>
 
-        <button class="btn btn-primary" type="submit">Enter the Dead Zone</button>
+        <button class="btn btn-primary" type="submit">Start the run</button>
     </form>
 </section>
 <?php require __DIR__ . '/includes/footer.php'; ?>

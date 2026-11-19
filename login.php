@@ -41,9 +41,9 @@ if (filter_input(INPUT_GET, 'bye', FILTER_VALIDATE_INT) === 1) {
 $pageTitle = 'Log in';
 require __DIR__ . '/includes/header.php';
 ?>
-<section class="auth-card">
+<section class="form-page">
     <h1>Log in</h1>
-    <p class="muted">The evacuation flights leave at dawn.</p>
+    <p class="lead">The last evacuation flight leaves at dawn.</p>
 
     <?php if ($error): ?>
         <div class="alert alert-error"><?= e($error) ?></div>
@@ -52,7 +52,7 @@ require __DIR__ . '/includes/header.php';
     <form method="post" action="login.php" novalidate>
         <div class="field">
             <label for="username">Username</label>
-            <input id="username" name="username" type="text" maxlength="20" autocomplete="username"
+            <input id="username" name="username" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"
                    value="<?= e($username) ?>" required>
         </div>
         <div class="field">
@@ -61,6 +61,6 @@ require __DIR__ . '/includes/header.php';
         </div>
         <button class="btn btn-primary" type="submit">Log in</button>
     </form>
-    <p class="muted small">New here? <a href="register.php">Create an account</a></p>
+    <p class="form-alt">New here? <a href="register.php">Create an account</a></p>
 </section>
 <?php require __DIR__ . '/includes/footer.php'; ?>
