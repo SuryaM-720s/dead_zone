@@ -23,6 +23,18 @@ function e($value): string
 }
 
 /**
+ * Escape story text and set it with proper typography:
+ * curly quotes, real apostrophes and a single-character ellipsis.
+ */
+function prose(string $text): string
+{
+    $text = str_replace('...', '…', $text);
+    $text = preg_replace('/"([^"]*)"/', '“$1”', $text);  // paired double quotes
+    $text = str_replace("'", '’', $text);                 // apostrophes
+    return e($text);
+}
+
+/**
  * Send the browser to another page and stop running this script.
  */
 function redirect(string $url): void

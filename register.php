@@ -50,9 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Register';
 require __DIR__ . '/includes/header.php';
 ?>
-<section class="auth-card">
-    <h1>Join the survivors</h1>
-    <p class="muted">Create an account so your runs show up on the leaderboard.</p>
+<section class="form-page">
+    <h1>Create an account</h1>
+    <p class="lead">Your username goes on the leaderboard next to every run you finish.</p>
 
     <?php if (isset($errors['form'])): ?>
         <div class="alert alert-error"><?= e($errors['form']) ?></div>
@@ -61,7 +61,7 @@ require __DIR__ . '/includes/header.php';
     <form method="post" action="register.php" novalidate>
         <div class="field <?= isset($errors['username']) ? 'has-error' : '' ?>">
             <label for="username">Username</label>
-            <input id="username" name="username" type="text" maxlength="20" autocomplete="username"
+            <input id="username" name="username" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"
                    value="<?= e($username) ?>" required>
             <?php if (isset($errors['username'])): ?><p class="field-error"><?= e($errors['username']) ?></p><?php endif; ?>
         </div>
@@ -77,6 +77,6 @@ require __DIR__ . '/includes/header.php';
         </div>
         <button class="btn btn-primary" type="submit">Create account</button>
     </form>
-    <p class="muted small">Already have an account? <a href="login.php">Log in</a></p>
+    <p class="form-alt">Already have an account? <a href="login.php">Log in</a></p>
 </section>
 <?php require __DIR__ . '/includes/footer.php'; ?>
