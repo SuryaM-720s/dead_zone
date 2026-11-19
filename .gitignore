@@ -1,0 +1,7 @@
+# Runtime data: contains password hashes, never commit
+data/*.json
+
+.DS_Store
+
+# Local editor/tool config
+.claude/
