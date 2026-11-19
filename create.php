@@ -6,7 +6,15 @@
  */
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/engine.php';
+require_once __DIR__ . '/includes/save.php';
 require_login();
+
+// Offer to resume a saved run if there's no run in this session
+$saved = has_active_run() ? ['status' => 'none'] : read_save();
+if ($saved['status'] === 'invalid') {
+    clear_save();
+    flash('error', 'Your saved run failed its integrity check and was discarded.');
+}
 
 $classes = class_defs();
 $errors = [];
@@ -35,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$errors) {
         start_run($name, $class);
+        write_save();
         redirect('game.php');
     }
 }
@@ -45,6 +54,24 @@ require __DIR__ . '/includes/header.php';
 <section class="create">
     <h1>Who are you?</h1>
     <p class="muted">Your class decides your starting stats, your gear, and which routes you can take.</p>
+
+    <?php if ($saved['status'] === 'ok'):
+        $savedHero = $saved['save']['hero'];
+        $savedPlace = story_nodes()[$saved['save']['node']]['title'];
+    ?>
+        <div class="panel resume">
+            <div>
+                <h2>Saved run found</h2>
+                <p class="muted small">
+                    <?= e($savedHero['name']) ?> the <?= e(class_defs()[$savedHero['class']]['label']) ?>
+                    · <?= e($savedPlace) ?> · move <?= $savedHero['moves'] + 1 ?>
+                </p>
+            </div>
+            <form method="post" action="resume.php">
+                <button class="btn btn-primary" type="submit">Resume</button>
+            </form>
+        </div>
+    <?php endif; ?>
 
     <?php if (has_active_run()): ?>
         <div class="alert alert-info">

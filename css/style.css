@@ -221,6 +221,18 @@ h2 { font-size: 1.05rem; letter-spacing: 0.02em; }
 .class-stats { font-size: 0.78rem; letter-spacing: 0.05em; color: var(--accent); }
 .class-perk { font-size: 0.85rem; color: #cfd3c5; }
 
+.resume {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border-color: rgba(180, 220, 74, 0.4);
+    margin-bottom: 1.5rem;
+}
+.resume h2,
+.resume p { margin: 0; }
+
 /* ---------- Landing ---------- */
 
 .hero-banner { padding: 2rem 0 2.5rem; }
@@ -363,6 +375,78 @@ h2 { font-size: 1.05rem; letter-spacing: 0.02em; }
 }
 .inventory li:last-child { border-bottom: 0; }
 .inventory form { margin: 0; }
+
+/* Explored map: 3×3 grid; unknown areas stay fogged */
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 2.6rem);
+    gap: 4px;
+}
+.map-cell {
+    display: grid;
+    place-items: center;
+    padding: 0 0.2rem;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1.15;
+    text-align: center;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+.map-unknown {
+    background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 4px, var(--surface) 4px, var(--surface) 8px);
+    color: #4b5243;
+    letter-spacing: 0.15em;
+}
+.map-visited { background: rgba(180, 220, 74, 0.12); color: #cfe79a; border: 1px solid rgba(180, 220, 74, 0.25); }
+.map-current {
+    background: var(--accent);
+    color: var(--accent-ink);
+    animation: map-pulse 1.8s ease-in-out infinite;
+}
+@keyframes map-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(180, 220, 74, 0.5); }
+    50% { box-shadow: 0 0 0 5px rgba(180, 220, 74, 0); }
+}
+
+/* Path Tracker: numbered route with a line down the left */
+.path-log {
+    list-style: none;
+    counter-reset: step;
+    margin: 0;
+    padding: 0;
+    max-height: 280px;
+    overflow-y: auto;
+}
+.path-log li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 0.7rem 1.9rem;
+    border-left: 1px solid var(--border);
+    margin-left: 0.6rem;
+}
+.path-log li:last-child { padding-bottom: 0; }
+.path-log li::before {
+    content: counter(step);
+    position: absolute;
+    left: -0.65rem;
+    top: 0;
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+}
+.path-log li.is-major::before { border-color: var(--accent); color: var(--accent); }
+.path-node { display: block; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.path-choice { display: block; font-size: 0.88rem; line-height: 1.4; }
+.ending .path-log { max-height: none; }
 
 /* ---------- Ending ---------- */
 

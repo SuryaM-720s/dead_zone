@@ -8,6 +8,7 @@
  */
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/engine.php';
+require_once __DIR__ . '/includes/save.php';
 require_login();
 
 if (isset($_SESSION['result'])) {
@@ -32,7 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    redirect(isset($_SESSION['result']) ? 'ending.php' : 'game.php');
+    // Keep the save cookie in sync: update it mid-run, delete it once the run ends
+    if (isset($_SESSION['result'])) {
+        clear_save();
+        redirect('ending.php');
+    }
+    write_save();
+    redirect('game.php');
 }
 
 $hero  = $_SESSION['hero'];
@@ -41,6 +48,7 @@ $event = $_SESSION['last_event'];
 $_SESSION['last_event'] = null; // narrator message shows once
 $classLabel = class_defs()[$hero['class']]['label'];
 $items = item_defs();
+$map = explored_map();
 
 /** Width/colour helper for the stat bars. */
 function bar(int $value, int $max): int
@@ -124,6 +132,18 @@ require __DIR__ . '/includes/header.php';
         </div>
 
         <div class="panel">
+            <h2>Map <span class="tag"><?= $map['seen'] ?>/<?= $map['total'] ?> explored</span></h2>
+            <div class="map-grid" role="img" aria-label="Explored areas map">
+                <?php foreach ($map['areas'] as $area): ?>
+                    <div class="map-cell map-<?= e($area['state']) ?>"
+                         style="grid-row: <?= $area['row'] ?>; grid-column: <?= $area['col'] ?>">
+                        <?= $area['state'] === 'unknown' ? '???' : e($area['label']) ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <div class="panel">
             <h2>Inventory</h2>
             <?php if (!$hero['inventory']): ?>
                 <p class="muted small">Empty.</p>
@@ -142,6 +162,22 @@ require __DIR__ . '/includes/header.php';
                         </li>
                     <?php endforeach; ?>
                 </ul>
+            <?php endif; ?>
+        </div>
+
+        <div class="panel">
+            <h2>Path Tracker</h2>
+            <?php if (!$_SESSION['choices_log']): ?>
+                <p class="muted small">Your route will appear here as you move.</p>
+            <?php else: ?>
+                <ol class="path-log">
+                    <?php foreach ($_SESSION['choices_log'] as $step): ?>
+                        <li class="<?= $step['major'] ? 'is-major' : '' ?>">
+                            <span class="path-node"><?= e($step['node']) ?></span>
+                            <span class="path-choice"><?= e($step['choice']) ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
             <?php endif; ?>
         </div>
     </aside>

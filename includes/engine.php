@@ -220,6 +220,65 @@ function consequence_preview(array $choice, array $hero): array
     return $parts;
 }
 
+/* ─────────────────────────── PATH TRACKER ─────────────────────────── */
+
+/**
+ * Build one Path Tracker entry from a node id and the index of the choice
+ * taken there. Storing ids (not just text) lets us rebuild the log later.
+ * A choice is "major" if it found items, rescued someone, risked a bite or
+ * needed a stat/item — those are the ones the Survivor Report mentions.
+ */
+function log_entry(string $nodeId, int $index): array
+{
+    $node = story_nodes()[$nodeId];
+    $choice = $node['choices'][$index];
+    return [
+        'node_id' => $nodeId,
+        'index'   => $index,
+        'node'    => $node['title'],
+        'choice'  => $choice['text'],
+        'major'   => !empty($choice['gives']) || !empty($choice['survivor'])
+                     || isset($choice['bite_risk']) || !empty($choice['requires']),
+    ];
+}
+
+/* ─────────────────────────── EXPLORED MAP ─────────────────────────── */
+
+/**
+ * Build the explored-area map from the visited node list.
+ * Returns each area with a state: 'current', 'visited' or 'unknown',
+ * plus how many of the maze's (non-ending) locations have been seen.
+ */
+function explored_map(): array
+{
+    $story = story_nodes();
+    $visitedAreas = [];
+    foreach ($_SESSION['visited'] as $nodeId) {
+        $visitedAreas[$story[$nodeId]['area']] = true;
+    }
+    $currentArea = $story[$_SESSION['node']]['area'];
+
+    $areas = [];
+    foreach (area_defs() as $key => $def) {
+        if ($key === $currentArea) {
+            $state = 'current';
+        } elseif (isset($visitedAreas[$key])) {
+            $state = 'visited';
+        } else {
+            $state = 'unknown';
+        }
+        $areas[$key] = $def + ['state' => $state];
+    }
+
+    // Count real locations only (ending nodes aren't places you explore)
+    $locations = array_filter($story, function ($node) {
+        return !isset($node['ending']);
+    });
+    $seen = count(array_intersect($_SESSION['visited'], array_keys($locations)));
+
+    return ['areas' => $areas, 'seen' => $seen, 'total' => count($locations)];
+}
+
 /* ─────────────────────────── GAME ACTIONS ─────────────────────────── */
 
 /**
@@ -286,13 +345,8 @@ function apply_choice(int $index): bool
     $hero['moves']++;
     clamp_stats($hero);
 
-    // 6. Log the choice (used by the Survivor Report)
-    $_SESSION['choices_log'][] = [
-        'node'   => $node['title'],
-        'choice' => $choice['text'],
-        'major'  => !empty($choice['gives']) || !empty($choice['survivor'])
-                    || isset($choice['bite_risk']) || !empty($choice['requires']),
-    ];
+    // 6. Log the choice (Path Tracker sidebar + Survivor Report)
+    $_SESSION['choices_log'][] = log_entry($_SESSION['node'], $index);
 
     // 7. Move, unless the noise you've made pulls a horde onto you
     $next = $choice['next'];

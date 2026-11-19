@@ -27,6 +27,20 @@ require __DIR__ . '/includes/header.php';
         <p><?= e($result['report']) ?></p>
     </div>
 
+    <?php if (!empty($_SESSION['choices_log'])): ?>
+        <div class="panel">
+            <h2>Your route</h2>
+            <ol class="path-log">
+                <?php foreach ($_SESSION['choices_log'] as $step): ?>
+                    <li class="<?= $step['major'] ? 'is-major' : '' ?>">
+                        <span class="path-node"><?= e($step['node']) ?></span>
+                        <span class="path-choice"><?= e($step['choice']) ?></span>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        </div>
+    <?php endif; ?>
+
     <div class="panel">
         <h2>Score</h2>
         <table class="breakdown">
