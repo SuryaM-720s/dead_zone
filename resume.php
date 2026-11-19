@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirect('create.php');
 }
 
+csrf_check();
+
 $check = read_save();
 if ($check['status'] === 'ok') {
     restore_save($check['save']);

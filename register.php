@@ -14,6 +14,7 @@ $errors = [];
 $username = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
     // Read raw input, then validate it ourselves
     $username = trim((string) filter_input(INPUT_POST, 'username', FILTER_UNSAFE_RAW));
     $password = (string) filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW);
@@ -59,6 +60,7 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <form method="post" action="register.php" novalidate>
+            <?= csrf_field() ?>
         <div class="field <?= isset($errors['username']) ? 'has-error' : '' ?>">
             <label for="username">Username</label>
             <input id="username" name="username" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"

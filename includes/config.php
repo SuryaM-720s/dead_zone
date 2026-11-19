@@ -60,3 +60,29 @@ function take_flashes(): array
     unset($_SESSION['flash']);
     return $messages;
 }
+
+/** Create or retrieve the session CSRF token. */
+function csrf_token(): string
+{
+    if (empty($_SESSION['csrf'])) {
+        $_SESSION['csrf'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf'];
+}
+
+/** Render an escaped hidden CSRF field for POST forms. */
+function csrf_field(): string
+{
+    return '<input type="hidden" name="csrf" value="' . e(csrf_token()) . '">';
+}
+
+/** Reject POST requests without the current session CSRF token. */
+function csrf_check(): void
+{
+    $given = $_POST['csrf'] ?? null;
+    if (!is_string($given) || !hash_equals(csrf_token(), $given)) {
+        flash('error', 'Your form expired. Please try again.');
+        $page = basename(parse_url($_SERVER['SCRIPT_NAME'] ?? 'index.php', PHP_URL_PATH));
+        redirect($page ?: 'index.php');
+    }
+}

@@ -19,6 +19,7 @@ if (!has_active_run()) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
     $action = filter_input(INPUT_POST, 'action', FILTER_UNSAFE_RAW);
 
     if ($action === 'choose') {
@@ -111,6 +112,7 @@ require __DIR__ . '/includes/header.php';
         </div>
 
         <form method="post" action="game.php">
+            <?= csrf_field() ?>
             <input type="hidden" name="action" value="choose">
             <p class="label">What do you do?</p>
             <ol class="choices">
@@ -198,6 +200,7 @@ require __DIR__ . '/includes/header.php';
                             <span><?= e(item_label($key)) ?><?php if ($count > 1): ?><span class="count">×<?= $count ?></span><?php endif; ?></span>
                             <?php if ($items[$key]['usable']): ?>
                                 <form method="post" action="game.php">
+            <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="use">
                                     <input type="hidden" name="item" value="<?= e($key) ?>">
                                     <button type="submit" class="btn-use" aria-label="Use <?= e(item_label($key)) ?>">Use</button>
