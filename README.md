@@ -2,14 +2,15 @@
 
 A text-based survival role-playing game for CSC 4370 Project 2, Topic 05 (Choose Your Path). Players register, log in, select a survivor class, and navigate a branching downtown outbreak. PHP handles choices, state, endings, scoring, and the rule-based Survival Advisor.
 
-## Live game
+## Live Game
 
-CODD URL: https://codd.cs.gsu.edu/~CODD_USERNAME/Surya_DeadZone/
+Play Dead Zone: Downtown here:
+https://codd.cs.gsu.edu/~smurugavvel1/WP/PW/Suryaprakash_deadzone/
 
 ## Team
 
-- Suryaprakash Murugavvel (student ID: STUDENT_ID) — project leader; story engine, game rules and scoring, login and sessions, save/resume, UI design
-- Victor Doga (student ID: STUDENT_ID) — team page, README and setup guide, CSRF protection on every form
+Suryaprakash Murugavvel (student ID: 002753274): project leader; story engine, game rules and scoring, login and sessions, save/resume, UI design
+Victor Doga (student ID: 002727573): team page, README and setup guide, CSRF protection on every form
 
 ## Setup
 
