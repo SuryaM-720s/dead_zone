@@ -69,7 +69,7 @@ require __DIR__ . '/includes/header.php';
                 </p>
             </div>
             <form method="post" action="resume.php">
-            <?= csrf_field() ?>
+                <?= csrf_field() ?>
                 <button class="btn btn-primary" type="submit">Resume this run</button>
             </form>
         </div>
@@ -83,7 +83,7 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <form method="post" action="create.php" novalidate>
-            <?= csrf_field() ?>
+        <?= csrf_field() ?>
         <div class="field name-field <?= isset($errors['name']) ? 'has-error' : '' ?>">
             <label for="name">Survivor name</label>
             <input id="name" name="name" type="text" maxlength="20" autocomplete="off" value="<?= e($name) ?>" required>

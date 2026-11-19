@@ -51,7 +51,7 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <form method="post" action="login.php" novalidate>
-            <?= csrf_field() ?>
+        <?= csrf_field() ?>
         <div class="field">
             <label for="username">Username</label>
             <input id="username" name="username" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"
