@@ -364,6 +364,40 @@ h2 { font-size: 1.05rem; letter-spacing: 0.02em; }
 .inventory li:last-child { border-bottom: 0; }
 .inventory form { margin: 0; }
 
+/* Explored map: 3×3 grid; unknown areas stay fogged */
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 2.6rem);
+    gap: 4px;
+}
+.map-cell {
+    display: grid;
+    place-items: center;
+    padding: 0 0.2rem;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1.15;
+    text-align: center;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+.map-unknown {
+    background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 4px, var(--surface) 4px, var(--surface) 8px);
+    color: #4b5243;
+    letter-spacing: 0.15em;
+}
+.map-visited { background: rgba(180, 220, 74, 0.12); color: #cfe79a; border: 1px solid rgba(180, 220, 74, 0.25); }
+.map-current {
+    background: var(--accent);
+    color: var(--accent-ink);
+    animation: map-pulse 1.8s ease-in-out infinite;
+}
+@keyframes map-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(180, 220, 74, 0.5); }
+    50% { box-shadow: 0 0 0 5px rgba(180, 220, 74, 0); }
+}
+
 /* Path Tracker: numbered route with a line down the left */
 .path-log {
     list-style: none;

@@ -595,6 +595,25 @@ function story_nodes(): array
 }
 
 /**
+ * Map regions for the explored-area map, laid out on a 3×3 grid
+ * (row, column). Every node's 'area' must be one of these keys.
+ */
+function area_defs(): array
+{
+    return [
+        'library'        => ['label' => 'Library',        'row' => 1, 'col' => 1],
+        'hall'           => ['label' => 'Lecture Hall',   'row' => 1, 'col' => 2],
+        'student_center' => ['label' => 'Student Center', 'row' => 1, 'col' => 3],
+        'deck'           => ['label' => 'Parking Deck',   'row' => 2, 'col' => 1],
+        'plaza'          => ['label' => 'Plaza',          'row' => 2, 'col' => 2],
+        'marta'          => ['label' => 'Five Points',    'row' => 2, 'col' => 3],
+        'downtown'       => ['label' => 'Downtown',       'row' => 3, 'col' => 1],
+        'hospital'       => ['label' => 'Hospital',       'row' => 3, 'col' => 2],
+        'stadium'        => ['label' => 'Stadium',        'row' => 3, 'col' => 3],
+    ];
+}
+
+/**
  * Ending screens. 'turned' and 'overrun' are triggered by stats
  * (infection / health), not by a node.
  */

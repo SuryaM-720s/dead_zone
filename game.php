@@ -41,6 +41,7 @@ $event = $_SESSION['last_event'];
 $_SESSION['last_event'] = null; // narrator message shows once
 $classLabel = class_defs()[$hero['class']]['label'];
 $items = item_defs();
+$map = explored_map();
 
 /** Width/colour helper for the stat bars. */
 function bar(int $value, int $max): int
@@ -121,6 +122,18 @@ require __DIR__ . '/includes/header.php';
                 </div>
             <?php endif; ?>
             <p class="muted small">Survivors with you: <?= $hero['survivors'] ?></p>
+        </div>
+
+        <div class="panel">
+            <h2>Map <span class="tag"><?= $map['seen'] ?>/<?= $map['total'] ?> explored</span></h2>
+            <div class="map-grid" role="img" aria-label="Explored areas map">
+                <?php foreach ($map['areas'] as $area): ?>
+                    <div class="map-cell map-<?= e($area['state']) ?>"
+                         style="grid-row: <?= $area['row'] ?>; grid-column: <?= $area['col'] ?>">
+                        <?= $area['state'] === 'unknown' ? '???' : e($area['label']) ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
 
         <div class="panel">

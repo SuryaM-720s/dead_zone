@@ -242,6 +242,43 @@ function log_entry(string $nodeId, int $index): array
     ];
 }
 
+/* ─────────────────────────── EXPLORED MAP ─────────────────────────── */
+
+/**
+ * Build the explored-area map from the visited node list.
+ * Returns each area with a state: 'current', 'visited' or 'unknown',
+ * plus how many of the maze's (non-ending) locations have been seen.
+ */
+function explored_map(): array
+{
+    $story = story_nodes();
+    $visitedAreas = [];
+    foreach ($_SESSION['visited'] as $nodeId) {
+        $visitedAreas[$story[$nodeId]['area']] = true;
+    }
+    $currentArea = $story[$_SESSION['node']]['area'];
+
+    $areas = [];
+    foreach (area_defs() as $key => $def) {
+        if ($key === $currentArea) {
+            $state = 'current';
+        } elseif (isset($visitedAreas[$key])) {
+            $state = 'visited';
+        } else {
+            $state = 'unknown';
+        }
+        $areas[$key] = $def + ['state' => $state];
+    }
+
+    // Count real locations only (ending nodes aren't places you explore)
+    $locations = array_filter($story, function ($node) {
+        return !isset($node['ending']);
+    });
+    $seen = count(array_intersect($_SESSION['visited'], array_keys($locations)));
+
+    return ['areas' => $areas, 'seen' => $seen, 'total' => count($locations)];
+}
+
 /* ─────────────────────────── GAME ACTIONS ─────────────────────────── */
 
 /**
