@@ -2,25 +2,45 @@
 /**
  * team.php
  * Public team introduction for Dead Zone: Downtown.
- * Uses the shared site header, footer, and HTML escaping helper.
+ * Lists the project leader and every member with their role, from one array
+ * so adding a member is a one-line change. No login required.
  */
 require_once __DIR__ . '/includes/auth.php';
+
+$members = [
+    [
+        'name' => 'Suryaprakash Murugavvel',
+        'role' => 'Project leader · PHP game development',
+        'does' => 'Story engine, game rules and scoring, login and sessions, save/resume, UI design.',
+    ],
+    [
+        'name' => 'Victor Doga',
+        'role' => 'Documentation · form security',
+        'does' => 'Team page, README and setup guide, CSRF protection on every form.',
+    ],
+];
+
 $pageTitle = 'Team';
 require __DIR__ . '/includes/header.php';
 ?>
-<section class="panel">
-    <div class="panel-head"><h1><?= e('Team') ?></h1></div>
-    <p class="lead"><?= e('Dead Zone: Downtown') ?></p>
-    <p><?= e('A PHP survival game where players navigate a downtown outbreak through choices that affect their survival.') ?></p>
-    <p class="label"><?= e('Project leader') ?></p>
-    <p><?= e('Suryaprakash Murugavvel (confirm leadership)') ?></p>
-</section>
-<section class="panel">
-    <div class="panel-head"><h2><?= e('Team members') ?></h2></div>
-    <p><?= e('Suryaprakash Murugavvel') ?></p>
-    <p class="muted small"><?= e('Role: Project lead and PHP game development (confirm responsibilities)') ?></p>
-    <p><?= e('Victor Doga') ?></p>
-    <p class="muted small"><?= e('Role: Team page, project documentation, and form security') ?></p>
-    <div class="btn-row"><a class="btn btn-primary" href="index.php"><?= e('Back to home') ?></a></div>
+<section class="team" aria-labelledby="team-title">
+    <p class="label">Project leader: <?= e($members[0]['name']) ?></p>
+    <h1 id="team-title">Dead Zone: Downtown</h1>
+    <p class="lead">A PHP survival game where players cross a downtown outbreak to the last evacuation flight, and every choice changes whether they make it.</p>
+
+    <h2>The team</h2>
+    <ul class="team-grid">
+        <?php foreach ($members as $member): ?>
+            <li class="panel">
+                <h3><?= e($member['name']) ?></h3>
+                <p class="label"><?= e($member['role']) ?></p>
+                <p class="muted"><?= e($member['does']) ?></p>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+
+    <div class="btn-row">
+        <a class="btn btn-primary" href="<?= is_logged_in() ? 'game.php' : 'register.php' ?>"><?= is_logged_in() ? 'Play the game' : 'Create an account' ?></a>
+    </div>
 </section>
 <?php require __DIR__ . '/includes/footer.php'; ?>

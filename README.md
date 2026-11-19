@@ -4,12 +4,12 @@ A text-based survival role-playing game for CSC 4370 Project 2, Topic 05 (Choose
 
 ## Live game
 
-CODD URL: **[Insert verified live CODD URL]**
+CODD URL: https://codd.cs.gsu.edu/~CODD_USERNAME/Surya_DeadZone/
 
 ## Team
 
-- Suryaprakash Murugavvel — project lead / game development **(confirm role and student ID)**
-- Victor Doga — team page, documentation, CSRF form protection **(confirm student ID)**
+- Suryaprakash Murugavvel (student ID: STUDENT_ID) — project leader; story engine, game rules and scoring, login and sessions, save/resume, UI design
+- Victor Doga (student ID: STUDENT_ID) — team page, README and setup guide, CSRF protection on every form
 
 ## Setup
 
@@ -17,7 +17,7 @@ Requires PHP 7.3 or later. Upload the repository to a PHP-enabled CODD directory
 
 ## How to play
 
-Register an account, log in, choose a survivor class, and follow story choices. Decisions change health, stamina, noise, infection, inventory, and survivors. Loud decisions can attract a horde; infection and other conditions can end a run. The ending shows the outcome and score; the session leaderboard displays recent scores.
+Register an account, log in, choose a survivor class, and follow story choices. Decisions change health, stamina, noise, infection, inventory, and survivors. Loud decisions can attract a horde; infection and other conditions can end a run. The ending shows the outcome and score. The leaderboard has two boards: this session's runs (temporary, cleared on logout) and the best runs from all players (saved on the server in `data/scores.json`).
 
 ## Folder structure
 
@@ -30,7 +30,7 @@ Register an account, log in, choose a survivor class, and follow story choices. 
 - `resume.php` — POST handler for restoring a validated saved run
 - `game.php` — story choices and inventory actions
 - `ending.php` — ending and Survivor Report
-- `leaderboard.php` — session leaderboard
+- `leaderboard.php` — session leaderboard and all-time leaderboard
 - `includes/config.php` — session setup, escaping, flash messages, and CSRF helpers
 - `includes/auth.php` — account storage and authentication
 - `includes/story.php` — story nodes and branching choices
@@ -58,7 +58,7 @@ The advisor is a deterministic rules engine, not a trained machine-learning mode
 
 **Score:** ending base + 150 per survivor + remaining health (if survived) + 20 per carried item (if survived) + 20 per move under 14 − 2 per infection point. The result is clamped to zero or higher. See the comment above `calculate_score()` in `includes/engine.php`.
 
-Run `php tests/advisor_test.php` from the project root. Output from the supplied repository, tested before these changes:
+Run `php tests/advisor_test.php` from the project root. Output:
 
 ```text
 PASS  Locked choice explains the stamina gap

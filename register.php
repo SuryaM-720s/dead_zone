@@ -60,7 +60,7 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <form method="post" action="register.php" novalidate>
-            <?= csrf_field() ?>
+        <?= csrf_field() ?>
         <div class="field <?= isset($errors['username']) ? 'has-error' : '' ?>">
             <label for="username">Username</label>
             <input id="username" name="username" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false"
