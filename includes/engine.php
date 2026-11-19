@@ -220,6 +220,28 @@ function consequence_preview(array $choice, array $hero): array
     return $parts;
 }
 
+/* ─────────────────────────── PATH TRACKER ─────────────────────────── */
+
+/**
+ * Build one Path Tracker entry from a node id and the index of the choice
+ * taken there. Storing ids (not just text) lets us rebuild the log later.
+ * A choice is "major" if it found items, rescued someone, risked a bite or
+ * needed a stat/item — those are the ones the Survivor Report mentions.
+ */
+function log_entry(string $nodeId, int $index): array
+{
+    $node = story_nodes()[$nodeId];
+    $choice = $node['choices'][$index];
+    return [
+        'node_id' => $nodeId,
+        'index'   => $index,
+        'node'    => $node['title'],
+        'choice'  => $choice['text'],
+        'major'   => !empty($choice['gives']) || !empty($choice['survivor'])
+                     || isset($choice['bite_risk']) || !empty($choice['requires']),
+    ];
+}
+
 /* ─────────────────────────── GAME ACTIONS ─────────────────────────── */
 
 /**
@@ -286,13 +308,8 @@ function apply_choice(int $index): bool
     $hero['moves']++;
     clamp_stats($hero);
 
-    // 6. Log the choice (used by the Survivor Report)
-    $_SESSION['choices_log'][] = [
-        'node'   => $node['title'],
-        'choice' => $choice['text'],
-        'major'  => !empty($choice['gives']) || !empty($choice['survivor'])
-                    || isset($choice['bite_risk']) || !empty($choice['requires']),
-    ];
+    // 6. Log the choice (Path Tracker sidebar + Survivor Report)
+    $_SESSION['choices_log'][] = log_entry($_SESSION['node'], $index);
 
     // 7. Move, unless the noise you've made pulls a horde onto you
     $next = $choice['next'];

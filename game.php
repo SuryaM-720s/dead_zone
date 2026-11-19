@@ -144,6 +144,22 @@ require __DIR__ . '/includes/header.php';
                 </ul>
             <?php endif; ?>
         </div>
+
+        <div class="panel">
+            <h2>Path Tracker</h2>
+            <?php if (!$_SESSION['choices_log']): ?>
+                <p class="muted small">Your route will appear here as you move.</p>
+            <?php else: ?>
+                <ol class="path-log">
+                    <?php foreach ($_SESSION['choices_log'] as $step): ?>
+                        <li class="<?= $step['major'] ? 'is-major' : '' ?>">
+                            <span class="path-node"><?= e($step['node']) ?></span>
+                            <span class="path-choice"><?= e($step['choice']) ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            <?php endif; ?>
+        </div>
     </aside>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>
