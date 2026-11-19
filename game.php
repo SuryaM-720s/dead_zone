@@ -50,113 +50,157 @@ $classLabel = class_defs()[$hero['class']]['label'];
 $items = item_defs();
 $map = explored_map();
 
-/** Width/colour helper for the stat bars. */
+$areaLabel = area_defs()[$node['area']]['label'];
+
+/** Percentage of $max, for meter widths. */
 function bar(int $value, int $max): int
 {
     return $max > 0 ? (int) round($value / $max * 100) : 0;
 }
 
+/**
+ * One stat row: label, mono value, thin meter. 'is-low' turns it orange-red
+ * when the stat drops into danger.
+ */
+function readout(string $label, string $value, int $percent, bool $low = false, string $meterClass = ''): string
+{
+    return '<div class="readout' . ($low ? ' is-low' : '') . '">'
+        . '<span>' . e($label) . '</span><b>' . e($value) . '</b>'
+        . '<div class="meter"><i class="' . e($meterClass) . '" style="width: ' . $percent . '%"></i></div>'
+        . '</div>';
+}
+
+$arrowIcon = '<svg class="choice-arrow" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5.5 15.5 10 11 14.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+$lockIcon  = '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="5" width="8" height="6" rx="1" fill="currentColor"/><path d="M4 5V3.5a2 2 0 0 1 4 0V5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
+
 $pageTitle = $node['title'];
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="game-layout">
-    <section class="story">
-        <p class="eyebrow">Move <?= $hero['moves'] + 1 ?> · <?= e(ucwords(str_replace('_', ' ', $node['area']))) ?></p>
-        <h1 class="title-type"><?= e($node['title']) ?></h1>
+    <section class="story" aria-labelledby="node-title">
+        <p class="location"><span>Move <?= $hero['moves'] + 1 ?></span><span><?= e($areaLabel) ?></span></p>
+        <h1 id="node-title"><?= e($node['title']) ?></h1>
+
+        <ul class="mobile-status" aria-label="Status">
+            <li class="<?= $hero['health'] <= 30 ? 'is-low' : '' ?>">Health <b><?= $hero['health'] ?></b></li>
+            <li class="<?= $hero['stamina'] < 20 ? 'is-low' : '' ?>">Stamina <b><?= $hero['stamina'] ?></b></li>
+            <li>Noise <b><?= $hero['noise'] ?>/<?= MAX_NOISE ?></b></li>
+            <?php if ($hero['infected']): ?>
+                <li class="is-low">Infection <b><?= $hero['infection'] ?>%</b></li>
+            <?php endif; ?>
+        </ul>
 
         <?php if ($event): ?>
-            <div class="narrator">
-                <?php if ($event['text'] !== ''): ?><p><?= e($event['text']) ?></p><?php endif; ?>
-                <?php foreach ($event['events'] as $line): ?>
-                    <p class="narrator-event"><?= e($line) ?></p>
-                <?php endforeach; ?>
+            <div class="log" role="status">
+                <p class="label">Last move</p>
+                <?php if ($event['text'] !== ''): ?><p><?= prose($event['text']) ?></p><?php endif; ?>
+                <?php if ($event['events']): ?>
+                    <ul class="log-events">
+                        <?php foreach ($event['events'] as $line): ?>
+                            <li><?= prose($line) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
 
         <div class="story-text">
             <?php foreach ($node['text'] as $i => $paragraph): ?>
-                <p style="--delay: <?= $i * 0.35 ?>s"><?= e($paragraph) ?></p>
+                <p style="--delay: <?= $i * 0.12 ?>s"><?= prose($paragraph) ?></p>
             <?php endforeach; ?>
         </div>
 
-        <form method="post" action="game.php" class="choices">
+        <form method="post" action="game.php">
             <input type="hidden" name="action" value="choose">
-            <?php foreach ($node['choices'] as $i => $choice):
-                $locked  = unmet_requirements($choice, $hero);
-                $preview = consequence_preview($choice, $hero);
-            ?>
-                <div class="choice <?= $locked ? 'is-locked' : '' ?>">
-                    <button type="submit" name="choice" value="<?= $i ?>" <?= $locked ? 'disabled' : '' ?>>
-                        <?= e($choice['text']) ?>
-                    </button>
-                    <?php if ($locked): ?>
-                        <p class="lock-reason"><?= e(implode(' ', $locked)) ?></p>
-                    <?php elseif ($preview): ?>
-                        <ul class="preview" aria-label="Advisor preview">
-                            <?php foreach ($preview as $part): ?>
-                                <li class="tone-<?= e($part['tone']) ?>"><?= e($part['text']) ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
+            <p class="label">What do you do?</p>
+            <ol class="choices">
+                <?php foreach ($node['choices'] as $i => $choice):
+                    $locked  = unmet_requirements($choice, $hero);
+                    $preview = consequence_preview($choice, $hero);
+                ?>
+                    <li class="choice<?= $locked ? ' is-locked' : '' ?>">
+                        <button type="submit" name="choice" value="<?= $i ?>"<?= $locked ? ' disabled' : '' ?>>
+                            <span class="choice-key" aria-hidden="true"><?= $i + 1 ?></span>
+                            <span class="choice-text">
+                                <span><?= e($choice['text']) ?></span>
+                                <?php if ($locked): ?>
+                                    <span class="lock-reason"><?= $lockIcon ?><span><?= e(implode(' ', $locked)) ?></span></span>
+                                <?php elseif ($preview): ?>
+                                    <span class="preview">
+                                        <?php foreach ($preview as $part): ?>
+                                            <span class="tone-<?= e($part['tone']) ?>"><?= e($part['text']) ?></span>
+                                        <?php endforeach; ?>
+                                    </span>
+                                <?php endif; ?>
+                            </span>
+                            <?= $locked ? '<span></span>' : $arrowIcon ?>
+                        </button>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
         </form>
     </section>
 
-    <aside class="sidebar">
+    <aside class="sidebar" aria-label="Survivor status">
         <div class="panel">
-            <h2><?= e($hero['name']) ?> <span class="tag"><?= e($classLabel) ?></span></h2>
-            <div class="stat">
-                <span>Health</span><span><?= $hero['health'] ?>/<?= $hero['max_health'] ?></span>
-                <div class="meter"><i class="m-health" style="width: <?= bar($hero['health'], $hero['max_health']) ?>%"></i></div>
+            <div class="panel-head">
+                <h2><?= e($hero['name']) ?></h2>
+                <span><?= e($classLabel) ?></span>
             </div>
-            <div class="stat">
-                <span>Stamina</span><span><?= $hero['stamina'] ?></span>
-                <div class="meter"><i class="m-stamina" style="width: <?= min(100, $hero['stamina']) ?>%"></i></div>
-            </div>
-            <div class="stat">
-                <span>Luck</span><span><?= $hero['luck'] ?></span>
-                <div class="meter"><i class="m-luck" style="width: <?= min(100, $hero['luck']) ?>%"></i></div>
-            </div>
-            <div class="stat">
-                <span>Noise</span><span><?= $hero['noise'] ?>/<?= MAX_NOISE ?></span>
-                <div class="meter"><i class="m-noise" style="width: <?= bar($hero['noise'], MAX_NOISE) ?>%"></i></div>
-            </div>
-            <?php if ($hero['infected']): ?>
-                <div class="stat stat-infection">
-                    <span>Infection</span><span><?= $hero['infection'] ?>%</span>
-                    <div class="meter"><i class="m-infection" style="width: <?= $hero['infection'] ?>%"></i></div>
+            <div class="stats">
+                <?= readout('Health', $hero['health'] . '/' . $hero['max_health'],
+                        bar($hero['health'], $hero['max_health']), $hero['health'] <= 30) ?>
+                <?= readout('Stamina', (string) $hero['stamina'], min(100, $hero['stamina']), $hero['stamina'] < 20) ?>
+                <?= readout('Luck', (string) $hero['luck'], min(100, $hero['luck'])) ?>
+                <div class="readout">
+                    <span>Noise</span><b><?= $hero['noise'] ?>/<?= MAX_NOISE ?></b>
+                    <div class="segments" aria-hidden="true">
+                        <?php for ($s = 1; $s <= MAX_NOISE; $s++): ?>
+                            <i class="<?= $s <= $hero['noise'] ? 'on' : '' ?><?= $s >= 5 ? ' loud' : '' ?>"></i>
+                        <?php endfor; ?>
+                    </div>
                 </div>
-            <?php endif; ?>
-            <p class="muted small">Survivors with you: <?= $hero['survivors'] ?></p>
+                <?php if ($hero['infected']): ?>
+                    <?= readout('Infection', $hero['infection'] . '%', $hero['infection'], true, 'm-infection') ?>
+                <?php endif; ?>
+            </div>
+            <p class="survivors">Survivors with you <b><?= $hero['survivors'] ?></b></p>
         </div>
 
         <div class="panel">
-            <h2>Map <span class="tag"><?= $map['seen'] ?>/<?= $map['total'] ?> explored</span></h2>
-            <div class="map-grid" role="img" aria-label="Explored areas map">
+            <div class="panel-head">
+                <h2>Map</h2>
+                <span><?= $map['seen'] ?>/<?= $map['total'] ?> explored</span>
+            </div>
+            <div class="map-grid" role="img" aria-label="Areas: <?= e(implode(', ', array_map(function ($a) {
+                return $a['label'] . ' ' . ($a['state'] === 'unknown' ? 'unexplored' : $a['state']);
+            }, $map['areas']))) ?>">
                 <?php foreach ($map['areas'] as $area): ?>
                     <div class="map-cell map-<?= e($area['state']) ?>"
-                         style="grid-row: <?= $area['row'] ?>; grid-column: <?= $area['col'] ?>">
-                        <?= $area['state'] === 'unknown' ? '???' : e($area['label']) ?>
+                        style="grid-row: <?= $area['row'] ?>; grid-column: <?= $area['col'] ?>">
+                        <?= $area['state'] === 'unknown' ? '' : e($area['label']) ?>
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
 
         <div class="panel">
-            <h2>Inventory</h2>
+            <div class="panel-head">
+                <h2>Inventory</h2>
+                <span><?= count($hero['inventory']) ?> items</span>
+            </div>
             <?php if (!$hero['inventory']): ?>
-                <p class="muted small">Empty.</p>
+                <p class="muted small">Nothing yet.</p>
             <?php else: ?>
                 <ul class="inventory">
                     <?php foreach (array_count_values($hero['inventory']) as $key => $count): ?>
                         <li>
-                            <span><?= e(item_label($key)) ?><?= $count > 1 ? ' ×' . $count : '' ?></span>
+                            <span><?= e(item_label($key)) ?><?php if ($count > 1): ?><span class="count">×<?= $count ?></span><?php endif; ?></span>
                             <?php if ($items[$key]['usable']): ?>
                                 <form method="post" action="game.php">
                                     <input type="hidden" name="action" value="use">
                                     <input type="hidden" name="item" value="<?= e($key) ?>">
-                                    <button type="submit" class="btn-mini">Use</button>
+                                    <button type="submit" class="btn-use" aria-label="Use <?= e(item_label($key)) ?>">Use</button>
                                 </form>
                             <?php endif; ?>
                         </li>
@@ -166,9 +210,12 @@ require __DIR__ . '/includes/header.php';
         </div>
 
         <div class="panel">
-            <h2>Path Tracker</h2>
+            <div class="panel-head">
+                <h2>Path tracker</h2>
+                <span><?= count($_SESSION['choices_log']) ?> moves</span>
+            </div>
             <?php if (!$_SESSION['choices_log']): ?>
-                <p class="muted small">Your route will appear here as you move.</p>
+                <p class="muted small">Your route shows up here as you move.</p>
             <?php else: ?>
                 <ol class="path-log">
                     <?php foreach ($_SESSION['choices_log'] as $step): ?>
