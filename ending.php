@@ -17,9 +17,9 @@ $ending = ending_defs()[$result['ending']];
 $pageTitle = $ending['label'];
 require __DIR__ . '/includes/header.php';
 ?>
-<section class="ending ending-<?= e($ending['type']) ?>">
+<section class="ending ending-<?= e($ending['type']) ?>" style="--chars: <?= strlen($ending['label']) ?>">
     <p class="label ending-type"><?= e(ucfirst($ending['type'])) ?> ending · <?= $result['moves'] ?> moves</p>
-    <h1><?= e($ending['label']) ?></h1>
+    <h1 class="type-on"><?= e($ending['label']) ?></h1>
     <p class="lead"><?= prose($ending['text']) ?></p>
 
     <div class="ending-grid">
