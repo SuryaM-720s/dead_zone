@@ -79,7 +79,7 @@ require __DIR__ . '/includes/header.php';
 <div class="game-layout">
     <section class="story" aria-labelledby="node-title">
         <p class="location"><span>Move <?= $hero['moves'] + 1 ?></span><span><?= e($areaLabel) ?></span></p>
-        <h1 id="node-title"><?= e($node['title']) ?></h1>
+        <h1 id="node-title" class="type-on" style="--chars: <?= strlen($node['title']) ?>"><?= e($node['title']) ?></h1>
 
         <ul class="mobile-status" aria-label="Status">
             <li class="<?= $hero['health'] <= 30 ? 'is-low' : '' ?>">Health <b><?= $hero['health'] ?></b></li>

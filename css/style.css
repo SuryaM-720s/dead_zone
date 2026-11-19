@@ -681,10 +681,50 @@ a:hover { text-decoration-color: var(--ink); }
 .badge-heroic { color: var(--good); }
 .badge-secret { color: var(--warn); }
 .badge-tragic { color: var(--infection); }
-.empty { padding: var(--s-8) var(--s-5); text-align: center; }
-.empty p { color: var(--muted); }
+.board { margin-bottom: var(--s-7); }
+.board-title { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3); flex-wrap: wrap; margin-bottom: var(--s-3); }
+.board-title h2 { margin: 0; font-size: 1.25rem; }
+.board-title p { margin: 0; }
+.empty { padding: var(--s-6) var(--s-5); text-align: center; }
+.empty p { margin: 0; color: var(--muted); }
+.visually-hidden {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 /* 12. Motion + responsive -------------------------------------------------- */
+
+/* Typewriter: the title is revealed one character-width step at a time.
+   PHP sets --chars to the title's length so the steps match the letters. */
+.type-on {
+    clip-path: inset(0 100% 0 0);
+    animation: type-on calc(var(--chars, 20) * 45ms) steps(var(--chars, 20), end) 120ms forwards;
+}
+@keyframes type-on { to { clip-path: inset(0 0 0 0); } }
+
+/* Animated conclusion: label, typed title, then each panel settles in turn */
+.ending .label,
+.ending .lead,
+.ending .panel,
+.ending .btn-row { animation: enter 600ms var(--ease-enter) both; }
+.ending .label { animation-delay: 0ms; }
+.ending .lead { animation-delay: calc(var(--chars, 12) * 45ms + 250ms); }
+.ending .panel:nth-child(1) { animation-delay: calc(var(--chars, 12) * 45ms + 400ms); }
+.ending .panel:nth-child(2) { animation-delay: calc(var(--chars, 12) * 45ms + 520ms); }
+.ending .panel:nth-child(3) { animation-delay: calc(var(--chars, 12) * 45ms + 640ms); }
+.ending .btn-row { animation-delay: calc(var(--chars, 12) * 45ms + 760ms); }
+/* tragic endings: one slow red wash across the page as it loads */
+.ending-tragic::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 0%, rgba(229, 72, 77, 0.22), transparent 70%);
+    animation: wash 2.4s ease-out both;
+}
+@keyframes wash { from { opacity: 1; } to { opacity: 0.35; } }
+
 @keyframes enter {
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: none; }
@@ -692,6 +732,7 @@ a:hover { text-decoration-color: var(--ink); }
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
+    .type-on { clip-path: none; }
 }
 
 @media (max-width: 960px) {
